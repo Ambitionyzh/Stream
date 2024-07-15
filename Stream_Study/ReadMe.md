@@ -133,3 +133,87 @@ private static void extracted3() {
             .forEach(author -> System.out.println(author.getName()));
 }
 ```
+
+##### flatMap 
+
+map只能把一个对象转换成另一个对象来作为流中的元素。而flatMap可以把一个对象转换成多个对象作为流中的元素。
+
+![image-20240710220339451](ReadMe.assets/image-20240710220339451.png)
+
+#### 3.4.3终结操作
+
+##### forEach
+
+对流中的元素进行遍历衡作，我们通过传入的参数去指定对遍历到的元素进行什么具体操作。
+
+##### count
+
+可以用来获取当前流中元素的个数。
+
+##### collect
+
+把当前流转换成个集合。
+例子：
+获取一个存放所有作者名字的List集合。
+
+##### 查找与匹配
+
+##### anyMatch
+
+可以用来判断是否有任意符合匹配条件的元素，结果为boolean类型。
+
+##### allMatch
+
+可以用来判断是否都符合匹配条件，结果为boolean类型。如果都符合结果为true,否则结果为false。
+例子：
+判断是否所有的作家都是成年人
+
+##### noneMatch
+
+可以判断流中的元素是否都不符合匹配条件。如果都不符合结果为true,否则结果为false
+例子：
+判断作家是否都没有超过100岁的。
+
+##### findAny
+
+获取流中的任意一个元素。该方法没有办法保证获取的一定是流中的第一个元素。
+
+##### findFirst
+
+获取流中的第一个元素。
+
+##### reduce归并
+
+对流中的数据按照你制定的计算方式计算出一个结果。
+reduce的作用是把stream中的元素给组合起来，我们可以传入一个初始值，它会按照我们的计算方式依次拿流中的元素和在初始化值的基础上进行计算，计算结果再和后面的元素计算。
+
+他内部的计算方式如下：
+
+```java
+T result identity;
+for (T element this stream)
+result = accumulator.apply(result,element)
+return result;
+```
+
+reduce一个参数的重载形式内部的计算 将第一个元素作为了初始值
+
+```java
+boolean foundAny false;
+T result = null;
+for (T element this stream){
+    if (foundAny){
+    foundAny true;
+    result element;
+}
+else
+result = accumulator.apply(result,element);
+}
+return foundAny？optional.of(result):Optional.empty();
+```
+
+#### 3.5注意事项
+
+* 惰性求值（如果没有终结操作，没有中间操作是不会得到执行的）
+*    流是一次性的（一旦一个流对象经过一个终结操作后。这个流就不能再被使用）
+* 不会影响原数据（我们在流中可以多数据做很多处理。但是正常情况下是不会影响原来集合中的元素的。这往往也是我们期望的）
