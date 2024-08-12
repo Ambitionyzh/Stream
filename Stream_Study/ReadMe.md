@@ -332,3 +332,194 @@ private static void testMap(){
 }	
 ```
 
+### 5.函数式接口
+
+#### 5.1概述
+
+
+**只有一个抽象方法**的接口我们称之为函数接口。
+JDK的函数式接口都加上了@Functionallnterface注解进行标识。但是无论是否加上该注解只要接口中只有一个抽象方法，都是函数式接口。
+
+#### 5.2常见函数式接口
+
+Consumer消费接口
+根据其中抽象方法的参数列表和返回值类型知道，我们可以在方法中对传入的参数进行消费。
+
+![image-20240812160458546](ReadMe.assets/image-20240812160458546.png)
+
+Function计算转换接口
+根据其中抽象方法的参数列表和返回值类型知道，我们可以在方法中对传入的参数计算或转换，把结果返回
+
+![image-20240812160539530](ReadMe.assets/image-20240812160539530.png)
+
+Predicate判斯接口
+根据其中抽象方法的参数列表和返回值类型知道，我们可以在方法中对传入的参数条件判断，返回判断结果
+
+![image-20240812160735151](ReadMe.assets/image-20240812160735151.png)
+
+Supplier生产型接口
+根据其中抽象方法的参数列表和返回值类型知道，我们可以在方法中创建对象，把创建好的对象返回
+
+![image-20240812160810421](ReadMe.assets/image-20240812160810421.png)
+
+#### 5.3 常用的默认方法
+
+##### and
+
+我们在使用Predicate接口时候可能需要进行判断条件的拼接。而and方法相当于是使用&&来拼接两个判断条件
+例如：
+打印作家中年龄大于17并目姓名的长度大于1的作家。
+
+```java
+List<Author>authors = getAuthors();
+stream<Author>authorstream = authors.stream();
+authorstream.filter(new Predicate<Author>()
+        @override
+        public boolean test(Author author){
+        return author.getAge()>17;
+    }.and(new Predicate<Author>()
+        @override
+        public boolean test(Author author){
+            return author.getName().length()>1;
+        }
+    })).forEach(author ->System.out.println(author));
+```
+
+##### or
+
+我们在使用Predicate接口时候可能需要进行判断条件的拼接。而or方法相当于是使用|来拼接两个判断条件。
+例如：
+打印作家中年龄大于17或者姓名的长度小于2的作家。
+
+```java
+List<Author>authors = getAuthors();
+authors.stream()
+.filter(new Predicate<Author>()
+    @override
+    public boolean test(Author author){
+   		 return author.getAge()>17;
+    }.or(new Predicate<Author>(){
+       		@override
+            public boolean test(Author author){
+            	return author.getName().length()<2;
+            }
+        }))forEach(author ->System.out.println(author.getName()))
+```
+
+negate
+Predicate接口中的方法。negate方法相当于是在判断添加前面加了个！表示取反
+例如：
+打印作家中年龄不大于17的作家。
+
+```java
+List<Author>authors = getAuthors ();
+authors .stream(
+    .filter (new Predicate<Author>()
+        @override
+        public boolean test(Author author){
+            return author.getAge()>17;
+        }
+}negate()).forEach (author ->System.out.println(author.getAge()));
+```
+
+### 6.方法引用
+
+我们在使用lambda时，如果方法体中只有一个方法的调用的话（包括构造方法），我们可以用方法引用进一步简化代码。
+
+#### 6.1推荐用法
+
+​	我们在使用lambda时不需要考虑什么时候用方法引用，用哪种方法引用，方法引用的格式是什么。我们只需要在写完lambda方法发现方法体只有一行代码，并且是方法的调用时使用快捷键尝试是否能够转换成方法引用即可。
+​	当我们方法引用使用的多了慢慢的也可以直接写出方法引用。
+
+#### 6.2基本格式
+
+类名或者对象名：方法名
+
+#### 6.3语法详解（了解）
+
+##### 6.3.1引用类的静态方法
+
+其实就是引用类的静态方法工
+**格式**
+
+```
+类名：：方法名
+```
+
+**使用前提**
+如果我们在重写方法的时候，方法体中**只有一行代码**，并且这行代码是**调用了某个类的静态方法**，并且我们把要重写的**抽象方法中所有的参数都按照顺序传入了这个静态方法中**，这个时候我们就可以引用类的静态方法。
+
+![image-20240812163812235](ReadMe.assets/image-20240812163812235.png)
+
+![image-20240812163734924](ReadMe.assets/image-20240812163734924.png)
+
+##### 6.3.2引用对象的实例方法
+
+**格式**
+
+```
+对象名：：方法名
+```
+
+**使用前提**
+如果我们在重写方法的时候，方法体中只有一行代码，并目这行代码是调用了某个对象的成员方法，并且我们把要重写的***抽象方法中所有的参数都按照顺序传入了这个成员方法中***，这个时候我们就可以引用对象的实例方法
+
+例如：
+
+```java
+List<Author>authors = getAuthors ();
+stream<Author>authorstream = authors.stream();
+StringBuilder sb = new StringBuilder();
+authorstream.map (author ->author.getName())
+.forEach (name->sb.append(name));
+```
+
+优化后：
+
+```java
+List<Author>authors = getAuthors ();
+stream<Author>authorstream = authors.stream();
+StringBuilder sb = new StringBuilder();
+authorstream.map (author ->author.getName()
+.forEach(sb::append);
+```
+
+##### 6.3.4引用类的实例方法
+
+**格式** 
+
+```
+类名：：方法名
+```
+
+
+使用前提
+如果我们在重写方法的时候，方法体中只有一行代码，并且这行代码是**调用了第一个参数的成员方法**，并目我们把要**重写的抽象方法中剩余的所有的参数都按照顺序传入了这个成员方法中**，这个时候我们就可以引用类的实例方法。
+
+```java
+interface Usestring{
+	string use(string str,int start,int length);
+}
+public static string subAuthorName(string str,Usestring usestring){
+    int = start 0;
+    int = length 1;
+    return usestring.use(str,start,length);
+}
+public static void main(string[]args){
+    subAuthorName("三更草堂"，new Usestring(O(
+    @override
+        public string use(string str,int start,int length){
+        return str.substring(start,length);
+        }
+    });
+}
+```
+
+优化过后如下：
+
+```java
+public static void main(String[] args){
+	subAuthorName("三更草"，str1ng::substring):
+}
+```
+
